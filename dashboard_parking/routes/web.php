@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SlotController;
 
-Route::get('/', function () {
-    return view('dashboard');
-});
+// Route untuk menampilkan dashboard
+Route::get('/dashboard', [SlotController::class, 'showDashboard']);
