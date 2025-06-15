@@ -1,14 +1,16 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SlotController;
 
-// Route untuk mendapatkan status slot per hari berdasarkan filter terisi/kosong
-Route::get('/slots/daily-hours', [SlotController::class, 'getSlots']);
+// Route for displaying dashboard data directly from the database
+Route::get('/dashboard', [SlotController::class, 'showDashboard']);  // Dashboard view route
 
-// Route untuk menerima data POST dari ESP32 dan menyimpannya ke database
-Route::post('/parking-slot', [SlotController::class, 'store']);
+// Route for fetching daily hours for the chart
+Route::get('/slots/daily-hours', [SlotController::class, 'getSlots']); // Route for daily chart data
 
-// Route untuk mendapatkan status terkini slot parkir (terisi/kosong)
-Route::get('/slots/latest-status', [SlotController::class, 'getLatestStatus']);
+// Route to receive POST data from ESP32 and save to the database
+Route::post('/parking-slot', [SlotController::class, 'store']); // Route to store data from ESP32
+
+// Route for fetching the latest status for slots (for real-time updates)
+Route::get('/slots/latest-status', [SlotController::class, 'getLatestStatus']); // Route for real-time slot status

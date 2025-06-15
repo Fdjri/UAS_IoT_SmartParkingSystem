@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class SlotController extends Controller
 {
-    // Method for displaying the dashboard with data directly from the database
+    // Method to display the dashboard with data directly from the database
     public function showDashboard()
     {
         // Fetch the latest status for each slot from the database (Slot 1, Slot 2, Slot 3)
@@ -115,7 +115,7 @@ class SlotController extends Controller
     // Method to receive POST data from ESP32 and save to the database
     public function store(Request $request)
     {
-        // Validate input data
+        // Validate input data from ESP32 (must be boolean)
         $request->validate([
             'slot1' => 'required|boolean',
             'slot2' => 'required|boolean',
@@ -124,7 +124,7 @@ class SlotController extends Controller
 
         $currentDate = now()->format('Y-m-d');
 
-        // Update or create for each slot
+        // Update or create for each slot based on ESP data
         $this->updateOrCreateSlot(1, $request->input('slot1'), $currentDate);
         $this->updateOrCreateSlot(2, $request->input('slot2'), $currentDate);
         $this->updateOrCreateSlot(3, $request->input('slot3'), $currentDate);
@@ -144,5 +144,31 @@ class SlotController extends Controller
                 'status' => $status
             ]
         );
+    }
+
+    // Method to get the latest status of each slot
+    public function getLatestStatus()
+    {
+        // Get the latest status for each slot
+        $slot1 = ParkingSlot::where('slot_number', 1)
+            ->latest('date')
+            ->first();
+        
+        $slot2 = ParkingSlot::where('slot_number', 2)
+            ->latest('date')
+            ->first();
+        
+        $slot3 = ParkingSlot::where('slot_number', 3)
+            ->latest('date')
+            ->first();
+
+        // Return the latest status
+        return response()->json([ 
+            'currentStatus' => [
+                $slot1 ? $slot1->status : null,  // Slot 1 status
+                $slot2 ? $slot2->status : null,  // Slot 2 status
+                $slot3 ? $slot3->status : null   // Slot 3 status
+            ]
+        ]);
     }
 }

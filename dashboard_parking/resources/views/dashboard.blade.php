@@ -39,18 +39,45 @@
     <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
       <div id="slot1" class="bg-white p-6 rounded shadow text-center">
         <h2 class="text-xl font-bold mb-2">Slot 1</h2>
-        <p id="slot1-status" class="text-2xl font-semibold">Tidak Ada Data</p>
-        <div id="slot1-indicator" class="mt-2 mx-auto w-8 h-8 rounded-full bg-gray-500"></div>
+        <p id="slot1-status" class="text-2xl font-semibold">
+          @if ($latestStatus['slot1'] === 1)
+            Isi
+          @elseif ($latestStatus['slot1'] === 0)
+            Kosong
+          @else
+            Tidak Ada Data
+          @endif
+        </p>
+        <div id="slot1-indicator" class="mt-2 mx-auto w-8 h-8 rounded-full 
+          {{ $latestStatus['slot1'] === 1 ? 'bg-red-500' : ($latestStatus['slot1'] === 0 ? 'bg-green-500' : 'bg-gray-500') }}"></div>
       </div>
       <div id="slot2" class="bg-white p-6 rounded shadow text-center">
         <h2 class="text-xl font-bold mb-2">Slot 2</h2>
-        <p id="slot2-status" class="text-2xl font-semibold">Tidak Ada Data</p>
-        <div id="slot2-indicator" class="mt-2 mx-auto w-8 h-8 rounded-full bg-gray-500"></div>
+        <p id="slot2-status" class="text-2xl font-semibold">
+          @if ($latestStatus['slot2'] === 1)
+            Isi
+          @elseif ($latestStatus['slot2'] === 0)
+            Kosong
+          @else
+            Tidak Ada Data
+          @endif
+        </p>
+        <div id="slot2-indicator" class="mt-2 mx-auto w-8 h-8 rounded-full 
+          {{ $latestStatus['slot2'] === 1 ? 'bg-red-500' : ($latestStatus['slot2'] === 0 ? 'bg-green-500' : 'bg-gray-500') }}"></div>
       </div>
       <div id="slot3" class="bg-white p-6 rounded shadow text-center">
         <h2 class="text-xl font-bold mb-2">Slot 3</h2>
-        <p id="slot3-status" class="text-2xl font-semibold">Tidak Ada Data</p>
-        <div id="slot3-indicator" class="mt-2 mx-auto w-8 h-8 rounded-full bg-gray-500"></div>
+        <p id="slot3-status" class="text-2xl font-semibold">
+          @if ($latestStatus['slot3'] === 1)
+            Isi
+          @elseif ($latestStatus['slot3'] === 0)
+            Kosong
+          @else
+            Tidak Ada Data
+          @endif
+        </p>
+        <div id="slot3-indicator" class="mt-2 mx-auto w-8 h-8 rounded-full 
+          {{ $latestStatus['slot3'] === 1 ? 'bg-red-500' : ($latestStatus['slot3'] === 0 ? 'bg-green-500' : 'bg-gray-500') }}"></div>
       </div>
     </div>
   </div>
@@ -61,7 +88,6 @@
     let chart;
     let labels = [];
     let dataSlots = { slot1: [], slot2: [], slot3: [] };
-    let currentStatus = [null, null, null];
 
     // Fetch data for the chart
     function fetchDataForChart() {
@@ -77,19 +103,6 @@
         .catch(err => console.error('Error fetching chart data:', err));
     }
 
-    // Fetch latest status for slots
-    function fetchDataForCard() {
-      fetch('/api/slots/latest-status')
-        .then(res => res.json())
-        .then(json => {
-          if (json && json.currentStatus) {
-            currentStatus = json.currentStatus;
-            updateSlotStatus();
-          }
-        })
-        .catch(err => console.error('Error fetching card status:', err));
-    }
-
     // Update the chart
     function updateChart() {
       chart.data.labels = labels;
@@ -97,21 +110,6 @@
       chart.data.datasets[1].data = dataSlots.slot2;
       chart.data.datasets[2].data = dataSlots.slot3;
       chart.update();
-    }
-
-    // Update the slot status on the card
-    function updateSlotStatus() {
-      // Slot 1
-      document.getElementById('slot1-status').textContent = currentStatus[0] === 1 ? 'Isi' : (currentStatus[0] === 0 ? 'Kosong' : 'Tidak Ada Data');
-      document.getElementById('slot1-indicator').className = currentStatus[0] === 1 ? 'bg-red-500' : (currentStatus[0] === 0 ? 'bg-green-500' : 'bg-gray-500');
-
-      // Slot 2
-      document.getElementById('slot2-status').textContent = currentStatus[1] === 1 ? 'Isi' : (currentStatus[1] === 0 ? 'Kosong' : 'Tidak Ada Data');
-      document.getElementById('slot2-indicator').className = currentStatus[1] === 1 ? 'bg-red-500' : (currentStatus[1] === 0 ? 'bg-green-500' : 'bg-gray-500');
-
-      // Slot 3
-      document.getElementById('slot3-status').textContent = currentStatus[2] === 1 ? 'Isi' : (currentStatus[2] === 0 ? 'Kosong' : 'Tidak Ada Data');
-      document.getElementById('slot3-indicator').className = currentStatus[2] === 1 ? 'bg-red-500' : (currentStatus[2] === 0 ? 'bg-green-500' : 'bg-gray-500');
     }
 
     // Update chart colors based on the filter (terisi or kosong)
@@ -220,11 +218,10 @@
       });
 
       fetchDataForChart();
-      fetchDataForCard();
 
       // Polling data every 5 seconds
       setInterval(() => {
-        fetchDataForCard();
+        fetchDataForChart();
       }, 5000);
     }
 
